@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 
@@ -42,16 +43,16 @@ public class UserDaoImp implements UserDao {
    }
 
    @Override
-   public User getUserByUsername(String Username) {
-      TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
-      query.setParameter("email", Username);
-      User user = null;
-      try {
-         user = query.getSingleResult();
-      } catch (Exception e) {
-         user = new User();
+   public User getUserByEmail(String email) {
+      List<User> userList = entityManager.createQuery(
+                      "SELECT user FROM User user join fetch  user.roles WHERE user.email =:email", User.class)
+              .setParameter("email", email)
+              .getResultList();
+      if (userList.isEmpty()) {
+         return null;
+      } else {
+         return userList.get(0);
       }
-      return user;
    }
 
    @Override

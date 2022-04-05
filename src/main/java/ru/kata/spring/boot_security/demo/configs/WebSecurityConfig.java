@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,7 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.service.UserServiceImp;
@@ -23,12 +26,12 @@ import javax.sql.DataSource;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserServiceImp userServiceImp;
     private final SuccessUserHandler successUserHandler;
+    private final UserDetailsService userDetailsService;
 
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, DataSource dataSource, UserServiceImp userServiceImp) {
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserDetailsService userDetailsService) {
         this.successUserHandler = successUserHandler;
-        this.userServiceImp = userServiceImp;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -37,8 +40,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                     .antMatchers("/", "/index").permitAll()
-                    .antMatchers("/user").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())
-                    .antMatchers("/admin/**").hasAnyAuthority(Role.ADMIN.name())
+                    .antMatchers("/user").hasAnyRole("ADMIN", "USER")
+                    .antMatchers("/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
                 .and()
                     .formLogin().successHandler(successUserHandler)
@@ -48,23 +51,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll();
     }
 
-    // аутентификация inMemory
-    /*@Bean
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        return authenticationProvider;
+    }
+
+    /*// аутентификация inMemory
+    @Bean
     @Override
     public UserDetailsService userDetailsService() {
         UserDetails user =
                 User.withDefaultPasswordEncoder()
                         .username("user")
                         .password("user")
-                        .roles("USER")
+                        .roles("ADMIN")
                         .build();
-
         return new InMemoryUserDetailsManager(user);
     }*/
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userServiceImp)
-                .passwordEncoder(NoOpPasswordEncoder.getInstance());
-    }
 }

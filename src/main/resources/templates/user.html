@@ -17,7 +17,7 @@
         <code>Your email is:</code>
         <code th:text="${user.getEmail()}"></code>
     </p>
-    <code>Your roles are</code>
+    <code>Your roles are:</code>
     <table>
         <tr th:each="role : ${user.getRoles()}">
             <th th:text="${role}"></th>

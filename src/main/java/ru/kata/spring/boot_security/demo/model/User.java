@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -19,9 +20,6 @@ public class User implements UserDetails {
    @Column(name = "password")
    private String password;
 
-   @Column(name = "active")
-   private boolean active;
-
    @Column(name = "name")
    private String firstName;
 
@@ -31,19 +29,20 @@ public class User implements UserDetails {
    @Column(name = "email")
    private String email;
 
-   @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-   @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-   @Enumerated(EnumType.STRING)
-   private Set<Role> roles;
+   @ManyToMany(fetch = FetchType.LAZY)
+   @JoinTable(name = "user_role",
+           joinColumns = @JoinColumn(name = "user_id"),
+           inverseJoinColumns = @JoinColumn(name = "role_id"))
+   private Set<Role> roles = new HashSet<>();
 
    public User() {}
 
-   public User(String firstName, String lastName, String email, String password, boolean active) {
+   public User(String firstName, String lastName, String email, String password, Set<Role> roles) {
       this.firstName = firstName;
       this.lastName = lastName;
       this.email = email;
       this.password = password;
-      this.active = active;
+      this.roles = roles;
    }
 
    public long getId() {
@@ -78,6 +77,7 @@ public class User implements UserDetails {
       this.email = email;
    }
 
+   @Override
    public String getPassword() {
       return password;
    }
@@ -89,14 +89,6 @@ public class User implements UserDetails {
 
    public void setPassword(String password) {
       this.password = password;
-   }
-
-   public boolean isActive() {
-      return active;
-   }
-
-   public void setActive(boolean active) {
-      this.active = active;
    }
 
    public Set<Role> getRoles() {
@@ -137,11 +129,15 @@ public class User implements UserDetails {
 
    @Override
    public boolean isEnabled() {
-      return isActive();
+      return true;
    }
 
    @Override
    public Collection<? extends GrantedAuthority> getAuthorities() {
       return getRoles();
+   }
+
+   public UserDetails UserAuthorization() {
+      return new org.springframework.security.core.userdetails.User(email, password, getAuthorities());
    }
 }
