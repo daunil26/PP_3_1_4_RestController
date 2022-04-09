@@ -28,15 +28,16 @@ public class AdminController {
     }
 
     @GetMapping
-    public String admin(Model users) {
-        List<User> userList = userService.listUsers();
-        users.addAttribute("userList", userList);
+    public String admin(@AuthenticationPrincipal org.springframework.security.core.userdetails.User user, Model users) {
+        users.addAttribute("user", userService.getUserByEmail(user.getUsername()));
+        users.addAttribute("userList", userService.listUsers());
+        users.addAttribute("roles", roleService.getAllRoles());
         return "admin";
     }
 
     @PostMapping
-    public String add(@ModelAttribute("user") User user) {
-        user.setRoles(roleService.getSetOfRoles("ROLE_USER"));
+    public String add(@ModelAttribute("user") User user, @RequestParam(value = "nameRoles") String[] roles) {
+        user.setRoles(roleService.getSetOfRoles(roles));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.add(user);
         return "redirect:/admin";
@@ -49,20 +50,24 @@ public class AdminController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable("id") int id,  Model model) {
+    public String edit(@PathVariable("id") int id,
+                       Model model,
+                       @ModelAttribute("user") User user,
+                       @RequestParam(value = "editRoles") String[] roles) {
+        user.setRoles(roleService.getSetOfRoles(roles));
+        model.addAttribute("roles", roleService.getAllRoles());
         model.addAttribute("user", userService.getUserById(id));
         return "edit";
     }
 
     @PostMapping("/{id}")
-    public String update(@ModelAttribute("user") User user, @PathVariable("id") int id) {
+    public String update(@ModelAttribute("user") User user,
+                         @PathVariable("id") int id,
+                         @RequestParam(value = "editRoles") String[] roles) {
+        user.setRoles(roleService.getSetOfRoles(roles));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.updateUser(user);
         return "redirect:/admin";
-    }
-
-    @GetMapping("/new")
-    public String newUser(@ModelAttribute("user") User user, Model model) {
-        return "new";
     }
 
 }

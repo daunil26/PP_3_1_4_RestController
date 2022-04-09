@@ -29,6 +29,9 @@ public class User implements UserDetails {
    @Column(name = "email")
    private String email;
 
+   @Column
+   private byte age;
+
    @ManyToMany(fetch = FetchType.LAZY)
    @JoinTable(name = "user_role",
            joinColumns = @JoinColumn(name = "user_id"),
@@ -37,10 +40,11 @@ public class User implements UserDetails {
 
    public User() {}
 
-   public User(String firstName, String lastName, String email, String password, Set<Role> roles) {
+   public User(String firstName, String lastName, String email, byte age, String password, Set<Role> roles) {
       this.firstName = firstName;
       this.lastName = lastName;
       this.email = email;
+      this.age = age;
       this.password = password;
       this.roles = roles;
    }
@@ -75,6 +79,14 @@ public class User implements UserDetails {
 
    public void setEmail(String email) {
       this.email = email;
+   }
+
+   public byte getAge() {
+      return age;
+   }
+
+   public void setAge(byte age) {
+      this.age = age;
    }
 
    @Override
