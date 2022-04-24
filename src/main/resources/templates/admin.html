@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
 
     <!-- Скрипты -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
@@ -97,7 +100,7 @@
                                     </tr>
                                     <tr class="bg-white">
                                         <td>
-                                            <table class="table">
+                                            <table class="table" id="allUsersTable">
                                                 <thead>
                                                 <tr>
                                                     <th scope="col">Id</th>
@@ -111,7 +114,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr th:each="lineUser : ${userList}">
+                                                <!--<tr th:each="lineUser : ${userList}">
                                                     <td th:text="${lineUser.getId()}"></td>
                                                     <td th:text="${lineUser.getFirstName()}"></td>
                                                     <td th:text="${lineUser.getLastName()}"></td>
@@ -131,13 +134,155 @@
                                                                 data-toggle="modal">Delete
                                                         </button>
                                                     </td>
-                                                </tr>
+                                                </tr>-->
                                                 </tbody>
                                             </table>
                                         </td>
                                     </tr>
                                     </tbody>
                                 </table>
+
+                                <!-- Modal для Edit -->
+
+                                <div class="modal fade" id="editModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="staticBackdropLabel">Edit user</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body p-0">
+                                                <div class="bg-white rounded-bottom">
+                                                    <form id="editModalForm">
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="idEdit" class="mb-0 font-weight-bold">ID</label>
+                                                                <input type="text" class="form-control" id="idEdit" name="idEdit" readonly>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="firstNameEdit" class="mb-0 font-weight-bold">First name</label>
+                                                                <input type="text" class="form-control" id="firstNameEdit" name="firstNameEdit">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="lastNameEdit" class="mb-0 font-weight-bold">Last name</label>
+                                                                <input type="text" class="form-control" id="lastNameEdit" name="lastNamEdit">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="ageEdit" class="mb-0 font-weight-bold">Age</label>
+                                                                <input type="number" class="form-control" id="ageEdit" name="ageEdit">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="emailEdit" class="mb-0 font-weight-bold">Email</label>
+                                                                <input type="email" class="form-control" id="emailEdit" name="emailEdit">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="passwordEdit" class="mb-0 font-weight-bold">Password</label>
+                                                                <input type="password" class="form-control" id="passwordEdit" name="passwordEdit">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="rolesListEdit" class="mb-0 font-weight-bold">Role</label>
+                                                                <select id="rolesListEdit" multiple class="form-control"
+                                                                        size="2" name="rolesListEdit" style="width: 210px">
+                                                                    <option th:each="role : ${roles}"
+                                                                            th:value="${role.name}"
+                                                                            th:text="${#strings.replace(role.name, 'ROLE_', '')}"
+                                                                            th:selected="${role.name} == USER">
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-primary">Edit</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Modal для Delete -->
+
+                                <div class="modal fade" id="deleteModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabelDel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="staticBackdropLabelDel">Edit user</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body p-0">
+                                                <div class="bg-white rounded-bottom">
+                                                    <form id="deleteModalForm">
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="idDelete" class="mb-0 font-weight-bold">ID</label>
+                                                                <input type="text" class="form-control" id="idDelete" name="idDelete" disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="firstNameDelete" class="mb-0 font-weight-bold">First name</label>
+                                                                <input type="text" class="form-control" id="firstNameDelete" name="firstNameDelete" disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="lastNameDelete" class="mb-0 font-weight-bold">Last name</label>
+                                                                <input type="text" class="form-control" id="lastNameDelete" name="lastNameDelete" disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="ageDelete" class="mb-0 font-weight-bold">Age</label>
+                                                                <input type="number" class="form-control" id="ageDelete" name="ageDelete" disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="emailDelete" class="mb-0 font-weight-bold">Email</label>
+                                                                <input type="email" class="form-control" id="emailDelete" name="emailDelete" disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row justify-content-center">
+                                                            <div class="col-6 text-center">
+                                                                <label for="rolesListDelete" class="mb-0 font-weight-bold">Roles:</label>
+                                                                <select multiple class="form-control"  id="rolesListDelete" name="rolesListDelete" size="2" disabled>
+                                                                    <option th:each="role : ${roles}"
+                                                                            th:value="${role.name}"
+                                                                            th:text="${#strings.replace(role.name, 'ROLE_', '')}"
+                                                                            th:selected="${role.name} == USER">
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                             </div>
 
@@ -156,45 +301,45 @@
                                     <tr class="bg-white">
                                         <td>
                                             <div class="container-fluid justify-content-center text-center fw-bold w-25">
-                                                <form class="col" th:action="@{/admin}" th:method="post" th:object="${userList}">
+                                                <form class="col" id="newUserForm" th:action="@{/admin}" th:method="post" th:object="${userList}">
                                                     <div class="row justify-content-center pb-3">
                                                         <div class="row">
                                                             <label >First name
-                                                                <input type="text" name="firstName" id="firstName"
+                                                                <input type="text" name="firstName" id="addFirstName"
                                                                        class="form-control"
                                                                        aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                                             </label>
                                                         </div>
                                                         <div class="row gy-2">
                                                             <label>Last name
-                                                                <input type="text" name="lastName" id="lastName"
+                                                                <input type="text" name="lastName" id="addLastName"
                                                                        class="form-control"
                                                                        aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                                             </label>
                                                         </div>
                                                         <div class="row gy-2">
                                                             <label>Age
-                                                                <input type="text" name="age" id="age"
+                                                                <input type="number" name="age" id="addAge"
                                                                        class="form-control"
                                                                        aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                                             </label>
                                                         </div>
                                                         <div class="row gy-2">
                                                             <label>Email
-                                                                <input type="text" name="email" id="email" class="form-control"
+                                                                <input type="email" name="email" id="addEmail" class="form-control"
                                                                        aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                                             </label>
                                                         </div>
                                                         <div class="row gy-2">
                                                             <label>Password
-                                                                <input type="password" name="password" id="password"
+                                                                <input type="password" name="password" id="addPassword"
                                                                        class="form-control"
                                                                        aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                                                             </label>
                                                         </div>
                                                         <div class="row gy-2">
-                                                            <label for="newRole">Role</label>
-                                                            <select id="newRole" class="custom-select bd-primary"
+                                                            <label for="addNewRole">Role</label>
+                                                            <select id="addNewRole" class="custom-select bd-primary"
                                                                     size="2" name="nameRoles" multiple="multiple">
                                                                 <option th:each="role : ${roles}"
                                                                         th:value="${role.name}"
@@ -216,156 +361,208 @@
                                     </tbody>
                                 </table>
 
-
-
                             </div>
 
                         </div>
 
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Окошко окно edit -->
-<div class="modal fade" th:each="editUser : ${userList}" th:id="${'edit' + editUser.getId()}">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form th:method="POST" th:action="@{/admin/{id}(id=${editUser.getId()})}">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalEdit">Edit user</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body container-fluid text-center col-6">
-                    <form role="form" class="form-horizontal">
-                        <div class="form-group">
-                            <label>ID
-                                <input type="text" class="form-control" th:value="${editUser.id}" readonly="readonly">
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label>Name
-                                <input type="text" class="form-control" th:value="${editUser.firstName}"
-                                       name="firstName">
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label>Last name
-                                <input type="text" class="form-control" th:value="${editUser.lastName}" name="lastName">
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label>Age
-                                <input type="text" class="form-control" th:value="${editUser.age}" name="age">
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label>Email
-                                <input type="text" class="form-control" th:value="${editUser.email}" name="email">
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label>Password
-                                <input type="password" class="form-control" th:value="${editUser.password}"
-                                       name="password">
-                            </label>
-                        </div>
-                        <div class="d-flex flex-row bd-highlight">
-                            <div class="form-group">
-                                <label>Role:
-                                    <select id="editRole" class="custom-select bd-primary"
-                                            size="2" name="editRoles" multiple="multiple" style="width: 210px">
-                                        <option th:each="role : ${roles}"
-                                                th:value="${role.name}"
-                                                th:text="${#strings.replace(role.name, 'ROLE_', '')}"
-                                                th:selected="${role.name} == USER">
-                                        </option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-info">Edit</button>
-                        </div>
-                    </form>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Окошко delete -->
-<div class="modal fade" th:each="deleteUser : ${userList}" th:id="${'delete' + deleteUser.getId()}">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form th:method="POST" th:action="@{/admin/{id}/remove(id=${deleteUser.getId()})}">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalDelete">Delete user</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body container-fluid text-center col-6">
-                <form role="form" class="form-horizontal">
-                    <div class="form-group">
-                        <label>ID
-                            <input type="text" class="form-control" th:value="${deleteUser.id}" readonly="readonly">
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Name
-                            <input type="text" class="form-control" th:value="${deleteUser.firstName}"
-                                   readonly="readonly">
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Last name
-                            <input type="text" class="form-control" th:value="${deleteUser.lastName}"
-                                   readonly="readonly">
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Age
-                            <input type="text" class="form-control" th:value="${deleteUser.age}"
-                                   readonly="readonly">
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Email
-                            <input type="text" class="form-control" th:value="${deleteUser.email}"
-                                   readonly="readonly">
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Password
-                            <input type="password" class="form-control" th:value="${deleteUser.password}"
-                                   readonly="readonly">
-                        </label>
-                    </div>
-                    <div class="d-flex flex-row bd-highlight">
-                        <div class="form-group">
-                            <label>Role:
-                                <select class="custom-select bd-primary" disabled="true" size="2" multiple name="roles" style="width: 210px">
-                                    <option value="1">ADMIN</option>
-                                    <option value="2">USER</option>
-                                </select>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-info">Delete</button>
-                    </div>
-                </form>
-            </div>
-            </form>
         </div>
     </div>
 </div>
 
 </body>
+
+<script th:fragment="usersTable" type="text/javascript">
+    const URLUserAPI = 'http://localhost:8080/api/users'
+    const usersTable = document.querySelector('#allUsersTable tbody')
+    const newUserForm = document.querySelector('#newUserForm')
+    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    const editModalForm = document.querySelector('#editModalForm');
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const deleteModalForm = document.querySelector('#deleteModalForm');
+
+    /*заполняем таблицу юзеров*/
+    const fillTable = (users) => {
+        let output = '';
+        users.forEach(user => {
+            output += `
+                  <tr id=${'row'+user.id}>
+                    <td>${user.id}</td>
+                    <td id=${'firstName'+user.id}>${user.firstName}</td>
+                    <td id=${'lastName'+user.id}>${user.lastName}</td>
+                    <td id=${'age'+user.id}>${user.age}</td>
+                    <td id=${'email'+user.id}>${user.email}</td>
+                    <td id=${'roles'+user.id}>
+                        ${user.roles.map(role => role.shortName).join(" ")}
+                    </td>
+                    <td class="text-white"><a class="btnEdit btn btn-info">Edit</a></td>
+                    <td class="text-white"><a class="btnDelete btn btn-danger">Delete</a></td>
+                   </tr>
+    `;
+        });
+        usersTable.innerHTML = output;
+    }
+
+    fetch(URLUserAPI)
+        .then(response => response.json())
+        .then(data => fillTable(data));
+
+    // Функция работы модалок
+    const on = (element, event, selector, handler) => {
+        element.addEventListener(event, el => {
+            if(el.target.closest(selector)){
+                handler(el)
+            }
+        })
+    }
+
+    /*добавим обработчик события для формы регистрации нового юзера*/
+    newUserForm.addEventListener('submit', (el) => {
+        /*удаляем стандартный обработчик события*/
+        el.preventDefault()
+        let tempNewUserForm = $('#newUserForm')
+        /*получаем значения полей с формы*/
+        let firstName = tempNewUserForm.find('#addFirstName').val()
+        let lastName = tempNewUserForm.find('#addLastName').val()
+        let age = tempNewUserForm.find('#addAge').val()
+        let email = tempNewUserForm.find('#addEmail').val()
+        let password = tempNewUserForm.find('#addPassword').val()
+        let authorities = tempNewUserForm.find('#addNewRole').val();
+        let roles = [];
+
+        authorities.forEach(roleName => {
+            roles.push({
+                id: roleName === "ROLE_ADMIN" ? 1 : 2,
+                name: roleName
+            });
+        })
+
+        /*создаём нового юзера*/
+        let newAddUser = {
+            firstName: firstName,
+            lastName: lastName,
+            age: age,
+            email: email,
+            password: password,
+            roles: roles
+        }
+
+        fetch(URLUserAPI, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newAddUser)
+            })
+            .then(response => response.json());
+
+        setTimeout(() => {
+            fetch(URLUserAPI)
+                .then(response => response.json())
+                .then(data => fillTable(data));
+
+            tempNewUserForm[0].reset();
+            $('.nav-tabs a[href="#nav-home"]').tab('show');
+
+            }, 1000);
+
+    })
+
+    // Edit - открытие и заполнение модалки
+    let idEditForm = 0
+    on(document, 'click', '.btnEdit', e => {
+        const rowToEdit = e.target.parentNode.parentNode
+        idEditForm = rowToEdit.children[0].innerHTML
+        const nameEditForm = rowToEdit.children[1].innerHTML
+        const lastNameEditForm = rowToEdit.children[2].innerHTML
+        const ageEditForm = rowToEdit.children[3].innerHTML
+        const usernameEditForm = rowToEdit.children[4].innerHTML
+        let rolesEditString = rowToEdit.children[5].innerHTML.trim().split(" ")
+        const rolesEditForm = rolesEditString.map((el) => {
+            return "ROLE_" + el;
+        });
+
+        $('#idEdit').val(idEditForm);
+        $('#firstNameEdit').val(nameEditForm);
+        $('#lastNameEdit').val(lastNameEditForm);
+        $('#ageEdit').val(ageEditForm);
+        $('#emailEdit').val(usernameEditForm);
+        $('#rolesListEdit').val(rolesEditForm);
+        editModal.show()
+    })
+
+    // Поведение кнопки у модалки Edit
+    editModalForm.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        let authorities = $('#rolesListEdit').val();
+        let roles = [];
+        authorities.forEach(roleName => {
+            roles.push({
+                id: roleName === "ROLE_ADMIN" ? 1 : 2,
+                name: roleName
+            });
+        })
+
+        let editedUser = {
+            id: $('#idEdit').val(),
+            firstName: $('#firstNameEdit').val(),
+            lastName: $('#lastNameEdit').val(),
+            age: $('#ageEdit').val(),
+            email: $('#emailEdit').val(),
+            password: $('#passwordEdit').val(),
+            authorities: $('#rolesListEdit').val(),
+            roles: roles
+        }
+        await fetch(URLUserAPI, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(editedUser)
+        })
+        let response = await fetch(URLUserAPI+"/"+idEditForm);
+        let data = await response.json();
+        document.getElementById('firstName' + idEditForm).innerHTML = data.firstName;
+        document.getElementById('lastName' + idEditForm).innerHTML = data.lastName;
+        document.getElementById('age' + idEditForm).innerHTML = data.age;
+        document.getElementById('email' + idEditForm).innerHTML = data.email;
+        document.getElementById('roles' + idEditForm).innerHTML = data.roles.map(role => role.shortName).join(" ");
+        editModal.hide()
+    })
+
+    // Delete - открытие и заполнение модалки
+    let idDeleteForm = 0
+    on(document, 'click', '.btnDelete', e => {
+        const rowToDelete = e.target.parentNode.parentNode
+        idDeleteForm = rowToDelete.children[0].innerHTML
+        const nameDeleteForm = rowToDelete.children[1].innerHTML
+        const lastNameDeleteForm = rowToDelete.children[2].innerHTML
+        const ageDeleteForm = rowToDelete.children[3].innerHTML
+        const usernameDeleteForm = rowToDelete.children[4].innerHTML
+        const rolesDeleteString = rowToDelete.children[5].innerHTML.trim().split(" ")
+        const rolesDeleteForm = rolesDeleteString.map((el) => {
+            return "ROLE_" + el;
+        });
+        $('#idDelete').val(idDeleteForm);
+        $('#firstNameDelete').val(nameDeleteForm);
+        $('#lastNameDelete').val(lastNameDeleteForm);
+        $('#ageDelete').val(ageDeleteForm);
+        $('#emailDelete').val(usernameDeleteForm);
+        $('#rolesListDelete').val(rolesDeleteForm);
+        deleteModal.show()
+    })
+
+    // Поведение кнопки у модалки Delete
+    deleteModalForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await fetch(URLUserAPI+"/"+idDeleteForm, {
+            method: 'DELETE'
+        })
+        document.getElementById('row' + idDeleteForm).remove();
+        deleteModal.hide()
+    })
+
+</script>
+
 </html>

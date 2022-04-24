@@ -18,13 +18,12 @@ public class AdminController {
 
     private final UserService userService;
     private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
+
 
     @Autowired
-    public AdminController(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -38,7 +37,6 @@ public class AdminController {
     @PostMapping
     public String add(@ModelAttribute("user") User user, @RequestParam(value = "nameRoles") String[] roles) {
         user.setRoles(roleService.getSetOfRoles(roles));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.add(user);
         return "redirect:/admin";
     }
@@ -65,7 +63,6 @@ public class AdminController {
                          @PathVariable("id") int id,
                          @RequestParam(value = "editRoles") String[] roles) {
         user.setRoles(roleService.getSetOfRoles(roles));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.updateUser(user);
         return "redirect:/admin";
     }

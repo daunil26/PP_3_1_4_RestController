@@ -17,19 +17,23 @@ import java.util.List;
 public class UserServiceImp implements UserService {
 
    private final UserDao userDao;
+//   private final PasswordEncoder passwordEncoder;
 
    @Autowired
    public UserServiceImp(UserDao userDao) {
       this.userDao = userDao;
+//      this.passwordEncoder = passwordEncoder;
    }
 
    @Override
    public void add(User user) {
+//      user.setPassword(passwordEncoder.encode(user.getPassword()));
       userDao.add(user);
    }
 
    @Override
    public User updateUser(User user) {
+//      user.setPassword(passwordEncoder.encode(user.getPassword()));
       return userDao.updateUser(user);
    }
 
@@ -39,12 +43,12 @@ public class UserServiceImp implements UserService {
    }
 
    @Override
-   public void removeUserById(int id) {
+   public void removeUserById(long id) {
       userDao.removeUserById(id);
    }
 
    @Override
-   public User getUserById(int id) {
+   public User getUserById(long id) {
       User user = userDao.getUserById(id);
       return user;
    }

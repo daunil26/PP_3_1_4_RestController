@@ -1,5 +1,8 @@
 package ru.kata.spring.boot_security.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -33,6 +36,7 @@ public class User implements UserDetails {
    private byte age;
 
    @ManyToMany(fetch = FetchType.LAZY)
+   @Fetch(FetchMode.JOIN)
    @JoinTable(name = "user_role",
            joinColumns = @JoinColumn(name = "user_id"),
            inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -144,6 +148,7 @@ public class User implements UserDetails {
       return true;
    }
 
+   @JsonIgnore
    @Override
    public Collection<? extends GrantedAuthority> getAuthorities() {
       return getRoles();
